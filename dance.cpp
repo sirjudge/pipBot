@@ -27,7 +27,7 @@ you must fix ArRobot’s state by calling ArRobot::clearDirectMotion() before ac
  */
 class DanceTime : public ArAction{
 public:
-	//constructor ArActionStallRecover recover;
+	//constructor
 	virtual danceTime();
 	//Destructor
 	~danceTime(void);
