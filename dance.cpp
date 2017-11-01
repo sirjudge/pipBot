@@ -10,13 +10,10 @@
 
 //TODO
 /*
- *
  * 1) add files to repository whenever tom adds git to the computer
  * 2) continue looking at the example
  *    http://robots.mobilerobots.com/docs/api/ARIA/2.9.1/docs/actionExample_8cpp-example.html
  * 3) Compile + run?
- *
- *
  */
 
 /*
@@ -88,34 +85,49 @@ ArActionDesired *DanceTime::fire(ArActionDesired currentDesired)
 	for(int i = 0; i < 10;i ++){
 	  ArLog::log(ArLog::Normal, "simpleMotionCommands: Rotating at 10 deg/s for 5 sec...");
 	  myRobot.lock();
-	  myRobot.setRotVel(50);
+	  myRobot.setRotVel(90);
 	  myRobot.unlock();
 	  ArUtil::sleep(1000);
 
 	  ArLog::log(ArLog::Normal, "simpleMotionCommands: Rotating at -10 deg/s for 10 sec...");
 	  myRobot.lock();
-	  myRobot.setRotVel(-50);
+	  myRobot.setRotVel(-90);
 	  myRobot.unlock();
 	  ArUtil::sleep(1000);
 	}
 
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
-	myRobot.lock();
-	myRobot.setRotVel(0);
-	myRobot.setVel(300);
-	myRobot.unlock();
-	ArUtil::sleep(3000);
+	for(int j = 0; j < 5; j++){
+		ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
+		myRobot.lock();
+		myRobot.setRotVel(45);
+		myRobot.setVel(300);
+		myRobot.unlock();
+		ArUtil::sleep(1000);
 
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-	myRobot.lock();
-	myRobot.stop();
-	myRobot.unlock();
-	ArUtil::sleep(1000);
-    // ArRobot contains an exit action for the Escape key. It also
+		ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
+		myRobot.lock();
+		myRobot.stop();
+		myRobot.unlock();
+		ArUtil::sleep(1000);
+
+		ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
+		myRobot.lock();
+		myRobot.setRotVel(45);
+		myRobot.setVel(300);
+		myRobot.unlock();
+		ArUtil::sleep(1000);
+
+		ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
+		myRobot.lock();
+		myRobot.stop();
+		myRobot.unlock();
+		ArUtil::sleep(1000);
+	}
+
+	// ArRobot contains an exit action for the Escape key. It also
 	// stores a pointer to the keyhandler so that other parts of the program can
 	// use the same keyhandler.
 	// robot.attachKeyHandler(&keyHandler);
-
 	printf("You may press escape to exit\n");
 	myRobot.waitForRunExit();
 	Aria::exit(0);
