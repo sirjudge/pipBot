@@ -1,17 +1,31 @@
-CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
+# To make all of the targets, just run
+#
+#    make
+#
+# To make the single target foo, run
+#
+#    make foo
+#
+# 'make clean' will remove _all_ targets and any lingering .o files.
+# You've been warned.
+#
 
-OBJS =		follow.o
+# Targets to be made.
+TARGETS = dance follow lasers
 
-LIBS =      /usr/local/Aria/lib/libAria.so
+CFLAGS=-fPIC -g -Wall
+ARIA_INCLUDE=-I/usr/local/Aria/include
+ARIA_LINK=-L/usr/local/Aria/lib -lAria -lpthread -ldl -lrt
 
-TARGET =	follow
+all:
+	make $(TARGETS)
 
-$(TARGET):	$(OBJS)
-	$(CXX) -o $(TARGET) $(OBJS) $(LIBS)
+# The "-" preceding the command line below will cause make to keep processing
+# targets if the compilation of a target fails.  If this is a problem, then
+# remove the "-".
 
-
-
-all:	$(TARGET)
+%: %.cpp $@
+	-$(CXX) $(CFLAGS) $(ARIA_INCLUDE) $< -o $@ $(ARIA_LINK)
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(TARGETS) *.o

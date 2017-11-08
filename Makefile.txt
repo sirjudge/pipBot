@@ -1,0 +1,26 @@
+#https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html
+#https://stackoverflow.com/questions/5098798/could-someone-explain-this-make-file
+#https://stackoverflow.com/questions/5191436/creating-two-separate-executables-from-a-makefile-g
+#https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html
+
+CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
+
+OBJS =		follow.o
+LIBS =      /usr/local/Aria/lib/libAria.so
+TARGET =	follow
+
+SOURCES = follow.cpp dance.cpp goHome.cpp   #sets the source files to be used for compiling
+OBJECTS = $(SOURCES:.cpp=.o)  #Sets the variable OBJECTS to be the same as SOURCES except replace the .cpp extension with .o
+
+
+
+all: $(SOURCES) 
+#tells make file to build everything in SOURCES
+
+
+$(TARGET):	$(OBJS)
+	$(CXX) -o $(TARGET) $(OBJS) $(LIBS)
+
+
+clean:
+	rm -f $(OBJS) $(TARGET)

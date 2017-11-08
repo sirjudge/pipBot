@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <stdio.h>
 
+//Nico, Konrad, Cat
+
 ArSick pewpew;
 ArSonarDevice sonar;
 ArRobot pipMan;
@@ -46,9 +48,6 @@ ArRobot pipMan;
 			int x = 1
 			foo(x)
 	*/
-
-	//TODO THE MUTEX LOCK ERROR IS SOMEWHERE IN THIS METHOD AAUUUGGGGHHH
-	//TODO maybe pointer stuff I dunno what even is cpp?
 	void follow(ArRobot *ar,ArSick& l){
 		ar->enableMotors();
 		std::cout<<"am I working?";

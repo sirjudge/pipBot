@@ -6,56 +6,54 @@
 #include <iomanip>
 #include <stdio.h>
 
-
-
 //TODO
 /*
  * 1) add files to repository whenever tom adds git to the computer
  * 2) continue looking at the example
  *    http://robots.mobilerobots.com/docs/api/ARIA/2.9.1/docs/actionExample_8cpp-example.html
  * 3) Compile + run?
- */
-
-/*
+ *
+ *
  * When using the ArAction class direct commands can still be used (for example
 ArRobot::setVel()), but if you mix direct motion commands with ArAction objects
 you must fix ArRobot’s state by calling ArRobot::clearDirectMotion() before actions will work again
  *
  */
-class DanceTime : public ArAction{
+
+class DanceClass : public ArAction{
 public:
-	//constructor
-	virtual danceTime();
-	//Destructor
-	~danceTime(void);
-	//link to fire method
-	ArRangeDevice *mySonar;
 	virtual ArActionDesired *fire(ArActionDesired currentDesired);
-	ArRobot myRobot = 0;
 	virtual void setRobot(ArRobot *robot);
+	DanceClass();
+	~DanceClass(void);
+	ArRangeDevice *mySonar;
+	ArRobot myRobot = 0;
 protected:
 	ArActionDesired myDesired;
 };
 
+DanceClass::~DanceClass(void){}
+
+DanceClass::DanceClass(): ArAction("tango","does a dance"){}
 
 /*
   Override ArAction::setRobot() to get the sonar device from the robot, or deactivate this action if it is missing.
   You must also call ArAction::setRobot() to properly store
   the ArRobot pointer in the ArAction base class.
 */
-void DanceTime::setRobot(ArRobot *robot)
+void DanceClass::setRobot(ArRobot *robot)
 {
-  ArAction::setRobot(robot);
-  mySonar = robot->findRangeDevice("sonar");
-  if (robot == NULL)
-    {
-      ArLog::log(ArLog::Terse, "actionExample: ActionGo: Warning: I found no sonar, deactivating.");
-      deactivate();
+	Aria::init();
+	ArAction::setRobot(robot);
+	mySonar = robot->findRangeDevice("sonar");
+	if (robot == NULL){
+		ArLog::log(ArLog::Terse, "actionExample: ActionGo: Warning: I found no sonar, deactivating.");
+		deactivate();
     }
 }
 
 
-ArActionDesired *DanceTime::fire(ArActionDesired currentDesired)
+ArActionDesired *DanceClass::fire(ArActionDesired currentDesired)
 {
 	//Reset desired action
 	myDesired.reset();
@@ -68,8 +66,8 @@ ArActionDesired *DanceTime::fire(ArActionDesired currentDesired)
 	ArLog::log(ArLog::Normal, "simpleMotionCommands: Will start dancing in 3 seconds...");
 	ArUtil::sleep(3000);
 
-	// Set forward velocity to 50 mm/s
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 250 mm/s for 5 sec...");
+	// Set forward velocity to 300 mm/s
+	ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 300 mm/s for 5 sec...");
 	myRobot.lock();
 	myRobot.enableMotors();
 	myRobot.setVel(300);
@@ -137,7 +135,6 @@ ArActionDesired *DanceTime::fire(ArActionDesired currentDesired)
 
 int main(int argc, char** argv)
 {
-  Aria::init();
   ArArgumentParser parser(&argc, argv);
   parser.loadDefaultArguments();
   ArRobot pipMan;
@@ -166,7 +163,7 @@ int main(int argc, char** argv)
   pipMan.addRangeDevice(&sonar);
 
   ArLog::log(ArLog::Normal, "actionExample: Connected to robot.");
-  DanceTime tango;
+  DanceClass tango;
   pipMan.addRangeDevice(&sonar);
   pipMan.addAction(&tango,42);
   pipMan.comInt(ArCommands::ENABLE, 1); 			//Turn on the motors
@@ -174,5 +171,4 @@ int main(int argc, char** argv)
 
   ArActionStallRecover recover;
 
-
-
+}
