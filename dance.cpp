@@ -24,7 +24,7 @@ class DanceClass : public ArAction{
 public:
 	virtual ArActionDesired *fire(ArActionDesired currentDesired);
 	virtual void setRobot(ArRobot *robot);
-	DanceClass();
+	DanceClass(); //TODO change to dancingwiththestars
 	~DanceClass(void);
 	ArRangeDevice *mySonar;
 	ArRobot *myRobot;

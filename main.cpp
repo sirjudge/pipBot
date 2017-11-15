@@ -3,11 +3,11 @@
 #include </usr/local/Aria/include/ariaUtil.h>
 #include <iostream>
 #include <iomanip>
-#include "follow.hh"
 #include "goHome.hh"
 #include </usr/local/Aria/include/ArActionGroup.h>
 #include </usr/local/Aria/include/ArFunctor.h>
 #include <stdio.h>
+#include "follow.hh"
 
 #define MAIN_ROBOT_PORT 8101
 #define IS_USING_SIM false
@@ -61,8 +61,6 @@ int main(int argc, char **argv) {
 	parser.loadDefaultArguments();
 
 	/* Connect to robot port */
-
-
 	ArRobotConnector robotConnector(&parser, &robot);
 	ArLaserConnector laserConnector(&parser, &robot, &robotConnector);
 
@@ -75,7 +73,6 @@ int main(int argc, char **argv) {
 			Aria::exit(1);
 		}
 	}
-
 	if (!Aria::parseArgs() || !parser.checkHelpAndWarnUnparsed()) {
 		Aria::logOptions();
 		Aria::exit(1);
@@ -83,7 +80,6 @@ int main(int argc, char **argv) {
 
 	/* Else add that the robot connected to the log */
 	ArLog::log(ArLog::Normal, "Connected to robot.");
-
 
 	// Create laser pointer (not a pun)
 	ArLaser *laser = new ArUrg_2_0(0, "laser 1");
@@ -112,8 +108,7 @@ int main(int argc, char **argv) {
 	std::cout << lasers->size() << endl;
 	std::map<int, ArLaser*>::iterator it = lasers->begin();
 	laser = it->second;
-	  
-	cout << "Hello, World!" << endl;
+
 	//laser->asyncConnect();
 	//laser->log();
 
