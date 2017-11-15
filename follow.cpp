@@ -64,8 +64,12 @@ ArActionDesired *PipFollow::fire(ArActionDesired currentDesired) {
   distLog = "Message: Distance to closes object: " << dist << "\n"
   ArLog::log(ArLog::Normal,distLog);
 
-  ArLog::log(ArLog::Normal,"\nDistance traveled: "<< distTraveledMeters <<" meters "  << distTraveledMM <<" mm in "<< timeFromStart <<" secs ");
-  ArLog::log(ArLog::Normal,"\nRotated " << angleFromStart<< " degrees.");
+  distancetraveledLog = "\nDistance traveled: "<< distTraveledMeters <<" meters "  << distTraveledMM <<" mm in "<< timeFromStart <<" secs ""
+  ArLog::log(ArLog::Normal, distancetraveledLog);
+
+  rotateLog = "\nRotated " << angleFromStart<< " degrees."
+  ArLog::log(ArLog::Normal,rotateLog);
+
   ArLog::log(ArLog::Normal, "\nAt " << PoseX<< "," << PoseY);
   ArLog::log(ArLog::Normal,"\nPress S to Stop");
   ArLog::log(ArLog::Normal,"\nPress H to go home");
