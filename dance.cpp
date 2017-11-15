@@ -27,14 +27,16 @@ public:
 	DanceClass();
 	~DanceClass(void);
 	ArRangeDevice *mySonar;
-	ArRobot myRobot = 0;
+	ArRobot *myRobot;
 protected:
 	ArActionDesired myDesired;
 };
 
 DanceClass::~DanceClass(void){}
 
-DanceClass::DanceClass(): ArAction("tango","does a dance"){}
+DanceClass::DanceClass(): ArAction("tango","does a dance"){
+	DanceClass::setRobot(myRobot);
+}
 
 /*
   Override ArAction::setRobot() to get the sonar device from the robot, or deactivate this action if it is missing.
@@ -44,7 +46,6 @@ DanceClass::DanceClass(): ArAction("tango","does a dance"){}
 void DanceClass::setRobot(ArRobot *robot)
 {
 	Aria::init();
-	ArAction::setRobot(robot);
 	mySonar = robot->findRangeDevice("sonar");
 	if (robot == NULL){
 		ArLog::log(ArLog::Terse, "actionExample: ActionGo: Warning: I found no sonar, deactivating.");
@@ -57,10 +58,10 @@ ArActionDesired *DanceClass::fire(ArActionDesired currentDesired)
 {
 	//Reset desired action
 	myDesired.reset();
-	myRobot.lock();
+	myRobot->lock();
 	ArLog::log(ArLog::Normal, "simpleMotionCommands: Pose=(%.2f,%.2f,%.2f), Trans. Vel=%.2f, Rot. Vel=%.2f, Battery=%.2fV",
-	myRobot.getX(), myRobot.getY(), myRobot.getTh(), myRobot.getVel(), myRobot.getRotVel(), myRobot.getBatteryVoltage());
-	myRobot.unlock();
+	myRobot->getX(), myRobot->getY(), myRobot->getTh(), myRobot->getVel(), myRobot->getRotVel(), myRobot->getBatteryVoltage());
+	myRobot->unlock();
 
 	// Sleep for 3 seconds.
 	ArLog::log(ArLog::Normal, "simpleMotionCommands: Will start dancing in 3 seconds...");
@@ -68,57 +69,57 @@ ArActionDesired *DanceClass::fire(ArActionDesired currentDesired)
 
 	// Set forward velocity to 300 mm/s
 	ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 300 mm/s for 5 sec...");
-	myRobot.lock();
-	myRobot.enableMotors();
-	myRobot.setVel(300);
-	myRobot.unlock();
+	myRobot->lock();
+	myRobot->enableMotors();
+	myRobot->setVel(300);
+	myRobot->unlock();
 	ArUtil::sleep(3000);
 
 	ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-	myRobot.lock();
-	myRobot.stop();
-	myRobot.unlock();
+	myRobot->lock();
+	myRobot->stop();
+	myRobot->unlock();
 	ArUtil::sleep(1000);
 
 	for(int i = 0; i < 10;i ++){
 	  ArLog::log(ArLog::Normal, "simpleMotionCommands: Rotating at 10 deg/s for 5 sec...");
-	  myRobot.lock();
-	  myRobot.setRotVel(90);
-	  myRobot.unlock();
+	  myRobot->lock();
+	  myRobot->setRotVel(90);
+	  myRobot->unlock();
 	  ArUtil::sleep(1000);
 
 	  ArLog::log(ArLog::Normal, "simpleMotionCommands: Rotating at -10 deg/s for 10 sec...");
-	  myRobot.lock();
-	  myRobot.setRotVel(-90);
-	  myRobot.unlock();
+	  myRobot->lock();
+	  myRobot->setRotVel(-90);
+	  myRobot->unlock();
 	  ArUtil::sleep(1000);
 	}
 
 	for(int j = 0; j < 5; j++){
 		ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
-		myRobot.lock();
-		myRobot.setRotVel(45);
-		myRobot.setVel(300);
-		myRobot.unlock();
+		myRobot->lock();
+		myRobot->setRotVel(45);
+		myRobot->setVel(300);
+		myRobot->unlock();
 		ArUtil::sleep(1000);
 
 		ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-		myRobot.lock();
-		myRobot.stop();
-		myRobot.unlock();
+		myRobot->lock();
+		myRobot->stop();
+		myRobot->unlock();
 		ArUtil::sleep(1000);
 
 		ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
-		myRobot.lock();
-		myRobot.setRotVel(45);
-		myRobot.setVel(300);
-		myRobot.unlock();
+		myRobot->lock();
+		myRobot->setRotVel(45);
+		myRobot->setVel(300);
+		myRobot->unlock();
 		ArUtil::sleep(1000);
 
 		ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-		myRobot.lock();
-		myRobot.stop();
-		myRobot.unlock();
+		myRobot->lock();
+		myRobot->stop();
+		myRobot->unlock();
 		ArUtil::sleep(1000);
 	}
 
@@ -127,18 +128,18 @@ ArActionDesired *DanceClass::fire(ArActionDesired currentDesired)
 	// use the same keyhandler.
 	// robot.attachKeyHandler(&keyHandler);
 	printf("You may press escape to exit\n");
-	myRobot.waitForRunExit();
+	myRobot->waitForRunExit();
 	Aria::exit(0);
 	return &myDesired;
 }
 
-
 int main(int argc, char** argv)
 {
+  Aria::init();
   ArArgumentParser parser(&argc, argv);
   parser.loadDefaultArguments();
   ArRobot pipMan;
-  ArSonarDevice sonar;
+
   // Connect to the robot, get some initial data from it such as type and name,
   // and then load parameter files for this robot.
   ArRobotConnector robotConnector(&parser, &pipMan);
@@ -160,11 +161,9 @@ int main(int argc, char** argv)
   pipMan.lock();									//Lock robot during set up
 
   pipMan.unlock(); 									//Unlock the robot
-  pipMan.addRangeDevice(&sonar);
 
   ArLog::log(ArLog::Normal, "actionExample: Connected to robot.");
   DanceClass tango;
-  pipMan.addRangeDevice(&sonar);
   pipMan.addAction(&tango,42);
   pipMan.comInt(ArCommands::ENABLE, 1); 			//Turn on the motors
 
