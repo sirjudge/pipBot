@@ -47,7 +47,7 @@ void DanceClass::setRobot(ArRobot *robot)
 {
 	Aria::init();
 	mySonar = robot->findRangeDevice("sonar");
-	if (robot == NULL){
+	if (robot == 0){
 		ArLog::log(ArLog::Terse, "actionExample: ActionGo: Warning: I found no sonar, deactivating.");
 		deactivate();
     }

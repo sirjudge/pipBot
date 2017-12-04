@@ -5,13 +5,16 @@
 #include </usr/local/Aria/include/ArFunctor.h>
 #include <list>
 #include <iostream>
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
 
 
 class PipFollow: public ArAction{
   public:
     ArRangeDevice *sonar;
     ArRangeDevice *laser;
-    ArRobot *myRobot;
+    ArRobot myRobot;
     virtual ArActionDesired *fire(ArActionDesired currentDesired);
     PipFollow();
     ~PipFollow(void);
@@ -20,19 +23,7 @@ class PipFollow: public ArAction{
 };
 
 
-PipFollow::PipFollow():ArAction("follow","follows a thing"){
-  laser = myRobot->findRangeDevice("urg2.0_1");
-  sonar = myRobot->findRangeDevice("sonar");
-  //std::list<ArRangeDevice> *list = myRobot->getRangeDeviceList();
-
-  // check if list is empty,else grab first item, set to myLaser, pew pew pew
-  //double check to see if this is how you check if something is null
-  if (laser == 0){
-    ArLog::log(ArLog::Normal, "deactivating because no laser");
-    deactivate();
-  }
-  ArLog::log(ArLog::Normal, "Laser connected, preparing to fire!");
-}
+PipFollow::PipFollow():ArAction("follow","follows a thing"){}
 
 //destructor
 PipFollow::~PipFollow(void){}
@@ -48,17 +39,16 @@ ArActionDesired *PipFollow::fire(ArActionDesired currentDesired) {
   // that you want the robot to take if this rule fires. Initially, we
   // must clear any previous actions.
   myDesired.reset();
-
   // Add your code to access the sonar sensors, decide whether the reaction
   // fires, and add commands to myDesired if it does.
   double angle = 0;
   double dist = laser->currentReadingPolar(-90, 90, &angle);
-  double distTraveledMeters = static_cast<int>(myRobot->getOdometerDistance()/1000);
-  double distTraveledMM = static_cast<int>(myRobot->getOdometerDistance())% 1000;
-  double timeFromStart = myRobot->getOdometerTime();
-  double angleFromStart = myRobot->getOdometerDegrees();
-  double PoseX=myRobot->getX();
-  double PoseY=myRobot->getY();
+  double distTraveledMeters = static_cast<int>(myRobot.getOdometerDistance()/1000);
+  double distTraveledMM = static_cast<int>(myRobot.getOdometerDistance())% 1000;
+  double timeFromStart = myRobot.getOdometerTime();
+  double angleFromStart = myRobot.getOdometerDegrees();
+  double PoseX=myRobot.getX();
+  double PoseY=myRobot.getY();
   bool contFollow = true;
 
   /*string distLog = "\nMessage: Distance to closes object: " << dist;
@@ -98,31 +88,61 @@ int main(int argc, char** argv){
   ArArgumentParser parser(&argc, argv);
   parser.loadDefaultArguments();
   ArRobot pipMan;
-  ArSonarDevice sonar;
   ArRobotConnector robotConnector(&parser, &pipMan);
-  if(!robotConnector.connectRobot())
-  {
-    ArLog::log(ArLog::Terse, "actionExample: Could not connect to the robot.");
-    if(parser.checkHelpAndWarnUnparsed())
+
+  if (!robotConnector.connectRobot())
     {
-      Aria::logOptions();
-      Aria::exit(1);
+      // Error connecting:
+      // if the user gave the -help argumentp, then just print out what happened,
+      // and continue so options can be displayed later.
+      if (!parser.checkHelpAndWarnUnparsed()){
+        ArLog::log(ArLog::Terse, "Could not connect to robot, will not have parameter file so options displayed later may not include everything");
+      }
+      // otherwise abort
+      else{
+        ArLog::log(ArLog::Terse, "Error, could not connect to robot.");
+        Aria::logOptions();
+        Aria::exit(1);
+      }
     }
-  }
-  if (!Aria::parseArgs() || !parser.checkHelpAndWarnUnparsed())
-  {
-    Aria::logOptions();
-    Aria::exit(1);
-  }
-  pipMan.runAsync(true); 							//Run in asynchronous mode
-  pipMan.lock();									//Lock robot during set up
+    if(!pipMan.isConnected())
+    {
+      ArLog::log(ArLog::Terse, "Internal error: robot connector succeeded but ArRobot::isConnected() is false!");
+    }
 
-  pipMan.unlock(); 									//Unlock the robot
+
+    if (!Aria::parseArgs() || !parser.checkHelpAndWarnUnparsed())
+      {
+        Aria::logOptions();
+        Aria::exit(1);
+        return 1;
+      }
+  ArLaserConnector laserConnector(&parser, &pipMan, &robotConnector);
+
+  ArSonarDevice sonar;
+
   pipMan.addRangeDevice(&sonar);
 
-  ArLog::log(ArLog::Normal, "Connected and ready to go");
+  if (!laserConnector.connectLasers(
+         false,  // continue after connection failures
+         false,  // add only connected lasers to ArRobot
+         true    // add all lasers to ArRobot
+   ))
+   {
+      printf("Warning: Could not connect to laser(s). Set LaserAutoConnect to false in this robot's individual parameter file to disable laser connection.\n");
+   }
+   ArLog::log(ArLog::Normal, "Connected and ready to go");
+
+  ArUtil::sleep(1000);
+  //pipMan.runAsync(true); 	//Run in asynchronous mode
+
+  //TODO: Segfaults here
   PipFollow follow;
-  pipMan.addRangeDevice(&sonar);
+  ArLog::log(ArLog::Normal, "follow action object created");
+
+
   pipMan.addAction(&follow,42);
+  ArLog::log(ArLog::Normal, "follow action added to pip");
+
   pipMan.comInt(ArCommands::ENABLE,1);
 }

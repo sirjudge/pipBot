@@ -20,6 +20,7 @@ void turn(int degrees, ArRobot *robot);
 ArActionGroup *followGroup;
 ArActionGroup *stopGroup;
 ArActionGroup *homeGroup;
+ArActionGroup *gohomeGroup;
 ArPose homePose;
 
  // Activate the teleop action group. activateExlcusive() causes
@@ -129,8 +130,11 @@ int main(int argc, char **argv) {
 
   	ArKeyHandler *keyHandler = Aria::getKeyHandler();
   	if (keyHandler == NULL)
+
   	{
-  	  keyHandler = new ArKeyHandler;
+  	  //bool ArKeyHandler::addKeyHandler( int 	keyToHandle, ArFunctor * 	functor)
+      //ArKeyHandler::addKeyHandler('f',follow)
+	  keyHandler = new ArKeyHandler;
    	  Aria::setKeyHandler(keyHandler);
    	  robot.attachKeyHandler(keyHandler);
  	}
@@ -167,6 +171,12 @@ int main(int argc, char **argv) {
 	// add the action limiterfar with the second largest priority
 	homeGroup->addAction(&limiterFar, 90);
 	// unlock the robot after adding the actions
+
+	// gohomeGroup = new ArActionGroup(&robot);
+
+	// gohomeGroup->addAction(&gotoPoseAction, 90);
+
+
 
 
 	std::cout << "Message: Begin robot main loop. W to set to Follow, S to set to Stop." << std::endl;
