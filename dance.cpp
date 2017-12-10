@@ -5,7 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
-
+#include <string>
 //TODO
 /*
  * 1) add files to repository whenever tom adds git to the computer
@@ -26,110 +26,58 @@ public:
 	virtual void setRobot(ArRobot *robot);
 	DanceClass(); //TODO change to dancingwiththestars
 	~DanceClass(void);
-	ArRangeDevice *mySonar;
-	ArRobot *myRobot;
+	ArRobot *robot;
 protected:
 	ArActionDesired myDesired;
 };
 
-DanceClass::~DanceClass(void){}
-
-DanceClass::DanceClass(): ArAction("tango","does a dance"){
-	DanceClass::setRobot(myRobot);
+void DanceClass::setRobot(ArRobot *robot) {
+  ArAction::setRobot(robot);
 }
+//TODO: This is the error that kills us all :(
+//		it's on line
+/*Warning: ArRobot cycle took too long because the loop was waiting for lock.
+       The cycle took 411 ms, (100 ms normal 250 ms warning)*/
+
+/*some more info with gdb debugging
+ *
+ArRobot::myPacketReader: Timed out (4) at 247574 (13916 into cycle after sleeping 200)
+Losing connection because no odometry received from robot in 243575 milliseconds (greater than the timeout of 8000).
+Warning: Task 'Packet Handler' took 13918 ms to run (longer than the 250 warning time)
+Warning: ArRobot sync tasks too long at 13918 ms, (100 ms normal 250 ms warning)
+157		//myRobot -> unlock();
+(gdb)
+Warning: ArRobot cycle took too long because the loop was waiting for lock.
+	The cycle took 2870 ms, (100 ms normal 250 ms warning)
+*/
 
 /*
   Override ArAction::setRobot() to get the sonar device from the robot, or deactivate this action if it is missing.
   You must also call ArAction::setRobot() to properly store
   the ArRobot pointer in the ArAction base class.
 */
-void DanceClass::setRobot(ArRobot *robot)
-{
-	Aria::init();
-	mySonar = robot->findRangeDevice("sonar");
-	if (robot == 0){
-		ArLog::log(ArLog::Terse, "actionExample: ActionGo: Warning: I found no sonar, deactivating.");
-		deactivate();
-    }
-}
 
 
+DanceClass::DanceClass(): ArAction("tango"){}
+
+DanceClass::~DanceClass(void){}
+
+//TODO: movement commands should be done with myDesired.move
 ArActionDesired *DanceClass::fire(ArActionDesired currentDesired)
 {
 	//Reset desired action
 	myDesired.reset();
-	myRobot->lock();
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Pose=(%.2f,%.2f,%.2f), Trans. Vel=%.2f, Rot. Vel=%.2f, Battery=%.2fV",
-	myRobot->getX(), myRobot->getY(), myRobot->getTh(), myRobot->getVel(), myRobot->getRotVel(), myRobot->getBatteryVoltage());
-	myRobot->unlock();
+	myRobot->getX(), myRobot -> getY(), myRobot -> getTh(), myRobot -> getVel(), myRobot -> getRotVel(), myRobot -> getBatteryVoltage();
+
 
 	// Sleep for 3 seconds.
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Will start dancing in 3 seconds...");
 	ArUtil::sleep(3000);
 
 	// Set forward velocity to 300 mm/s
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 300 mm/s for 5 sec...");
-	myRobot->lock();
-	myRobot->enableMotors();
-	myRobot->setVel(300);
-	myRobot->unlock();
+	//myRobot -> lock();
+	myDesired.setVel(300);
+	//myRobot -> unlock();
 	ArUtil::sleep(3000);
-
-	ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-	myRobot->lock();
-	myRobot->stop();
-	myRobot->unlock();
-	ArUtil::sleep(1000);
-
-	for(int i = 0; i < 10;i ++){
-	  ArLog::log(ArLog::Normal, "simpleMotionCommands: Rotating at 10 deg/s for 5 sec...");
-	  myRobot->lock();
-	  myRobot->setRotVel(90);
-	  myRobot->unlock();
-	  ArUtil::sleep(1000);
-
-	  ArLog::log(ArLog::Normal, "simpleMotionCommands: Rotating at -10 deg/s for 10 sec...");
-	  myRobot->lock();
-	  myRobot->setRotVel(-90);
-	  myRobot->unlock();
-	  ArUtil::sleep(1000);
-	}
-
-	for(int j = 0; j < 5; j++){
-		ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
-		myRobot->lock();
-		myRobot->setRotVel(45);
-		myRobot->setVel(300);
-		myRobot->unlock();
-		ArUtil::sleep(1000);
-
-		ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-		myRobot->lock();
-		myRobot->stop();
-		myRobot->unlock();
-		ArUtil::sleep(1000);
-
-		ArLog::log(ArLog::Normal, "simpleMotionCommands: Driving forward at 150 mm/s for 5 sec...");
-		myRobot->lock();
-		myRobot->setRotVel(45);
-		myRobot->setVel(300);
-		myRobot->unlock();
-		ArUtil::sleep(1000);
-
-		ArLog::log(ArLog::Normal, "simpleMotionCommands: Stopping.");
-		myRobot->lock();
-		myRobot->stop();
-		myRobot->unlock();
-		ArUtil::sleep(1000);
-	}
-
-	// ArRobot contains an exit action for the Escape key. It also
-	// stores a pointer to the keyhandler so that other parts of the program can
-	// use the same keyhandler.
-	// robot.attachKeyHandler(&keyHandler);
-	printf("You may press escape to exit\n");
-	myRobot->waitForRunExit();
-	Aria::exit(0);
 	return &myDesired;
 }
 
@@ -143,6 +91,7 @@ int main(int argc, char** argv)
   // Connect to the robot, get some initial data from it such as type and name,
   // and then load parameter files for this robot.
   ArRobotConnector robotConnector(&parser, &pipMan);
+  //pipMan.addPacketHandler(new ArGlobalRetFunctor1<bool, ArRobotPacket*>(&handleDebugMessage));
   if(!robotConnector.connectRobot())
   {
     ArLog::log(ArLog::Terse, "actionExample: Could not connect to the robot.");
@@ -157,13 +106,12 @@ int main(int argc, char** argv)
     Aria::logOptions();
     Aria::exit(1);
   }
-  pipMan.runAsync(true); 							//Run in asynchronous mode
-  pipMan.lock();									//Lock robot during set up
-
-  pipMan.unlock(); 									//Unlock the robot
 
   ArLog::log(ArLog::Normal, "actionExample: Connected to robot.");
+  ArLog::log(ArLog::Normal, "creating DanceClass tango");
+  ArLog::log(ArLog::Normal, "adding tango to pipMan's list");
   DanceClass tango;
+  ArLog::log(ArLog::Normal, "tango has been created");
   pipMan.addAction(&tango,42);
   pipMan.comInt(ArCommands::ENABLE, 1); 			//Turn on the motors
 

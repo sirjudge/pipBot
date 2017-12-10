@@ -13,7 +13,7 @@
 # Targets to be made.
 TARGETS = dance follow lasers goHome
 
-CFLAGS=-fPIC -g -Wall
+CFLAGS=-fPIC -g -Wall -Wextra
 ARIA_INCLUDE=-I/usr/local/Aria/include
 ARIA_LINK=-L/usr/local/Aria/lib -lAria -lpthread -ldl -lrt
 

@@ -3,8 +3,9 @@
 // Constructor for the reactive class. Add any  you need (which
 // will probably be stored in a state variable).
 
-PipGoHome::PipGoHome() : ArAction("goHome") {
+PipGoToHome::PipGoToHome() : ArAction("goHome") {
   myRobot = NULL;
+  myLaser = NULL;
 // Store any parameters in state variables
 }
 
@@ -13,8 +14,7 @@ PipGoHome::PipGoHome() : ArAction("goHome") {
 
 void PipFollow::setRobot(ArRobot *robot) {
   myRobot = robot;
-  myLaser = myRobot->findRangeDevice("urg2.0_1");                               
-                               
+  myLaser = myRobot->findRangeDevice("urg2.0_1");
 
   std::list< ArRangeDevice * > *list = myRobot->getRangeDeviceList();
 

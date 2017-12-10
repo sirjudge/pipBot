@@ -8,22 +8,23 @@
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
-
+#include <string>
 
 class PipFollow: public ArAction{
   public:
     ArRangeDevice *sonar;
     ArRangeDevice *laser;
-    ArRobot myRobot;
+    ArRobot *myRobot;
     virtual ArActionDesired *fire(ArActionDesired currentDesired);
-    PipFollow();
+    PipFollow(ArRobot *robot);
     ~PipFollow(void);
   protected:
     ArActionDesired myDesired;
 };
 
-
-PipFollow::PipFollow():ArAction("follow","follows a thing"){}
+PipFollow::PipFollow(ArRobot *robit):ArAction("follow","follows a thing"){
+	ArAction::setRobot(robit);
+}
 
 //destructor
 PipFollow::~PipFollow(void){}
@@ -39,28 +40,24 @@ ArActionDesired *PipFollow::fire(ArActionDesired currentDesired) {
   // that you want the robot to take if this rule fires. Initially, we
   // must clear any previous actions.
   myDesired.reset();
-  // Add your code to access the sonar sensors, decide whether the reaction
-  // fires, and add commands to myDesired if it does.
+  // just a bunch of print statements and stuff
   double angle = 0;
   double dist = laser->currentReadingPolar(-90, 90, &angle);
-  double distTraveledMeters = static_cast<int>(myRobot.getOdometerDistance()/1000);
-  double distTraveledMM = static_cast<int>(myRobot.getOdometerDistance())% 1000;
-  double timeFromStart = myRobot.getOdometerTime();
-  double angleFromStart = myRobot.getOdometerDegrees();
-  double PoseX=myRobot.getX();
-  double PoseY=myRobot.getY();
+  double distTraveledMeters = static_cast<int>(myRobot->getOdometerDistance()/1000);
+  double distTraveledMM = static_cast<int>(myRobot->getOdometerDistance())% 1000;
+  double timeFromStart = myRobot->getOdometerTime();
+  double angleFromStart = myRobot->getOdometerDegrees();
+  double PoseX=myRobot->getX();
+  double PoseY=myRobot->getY();
   bool contFollow = true;
 
-  /*string distLog = "\nMessage: Distance to closes object: " << dist;
-  //ArLog::log(ArLog::Normal,distLog);
-  string distancetraveledLog = "\nDistance traveled: "<< distTraveledMeters <<" meters "  << distTraveledMM <<" mm in "<< timeFromStart <<" secs ";
-  //ArLog::log(ArLog::Normal, distancetraveledLog);
-  string  rotateLog = "\nRotated " << angleFromStart<< " degrees.";
-  //ArLog::log(ArLog::Normal,rotateLog);
-  string posLog =  "\nAt " << PoseX<< "," << PoseY; 
-  //ArLog::log(ArLog::Normal,posLog);
-  //ArLog::log(ArLog::Normal,"\nPress S to Stop");
-  //ArLog::log(ArLog::Normal,"\nPress H to go home");*/
+  std::cout <<  "\nMessage: Distance to closes object: " << dist;
+  std::cout <<  "\nDistance traveled: "<< distTraveledMeters <<" meters "  << distTraveledMM <<" mm in "<< timeFromStart <<" secs ";
+  std::cout <<  "\nRotated " << angleFromStart<< " degrees.";
+
+  //std::cout <<  "\nAt " << PoseX<< "," << PoseY;
+  ArLog::log(ArLog::Normal,"\nPress S to Stop");
+  ArLog::log(ArLog::Normal,"\nPress H to go home");
   while(contFollow){
     if(dist > 100){
       myDesired.setDeltaHeading(angle);
@@ -134,10 +131,10 @@ int main(int argc, char** argv){
    ArLog::log(ArLog::Normal, "Connected and ready to go");
 
   ArUtil::sleep(1000);
-  //pipMan.runAsync(true); 	//Run in asynchronous mode
+  pipMan.runAsync(true); 	//Run in asynchronous mode
 
-  //TODO: Segfaults here
-  PipFollow follow;
+\
+  PipFollow follow = PipFollow(&pipMan);
   ArLog::log(ArLog::Normal, "follow action object created");
 
 

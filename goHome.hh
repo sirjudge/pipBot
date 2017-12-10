@@ -22,7 +22,6 @@ class PipGoToHome : public ArAction
   ArRangeDevice *myLaser;
   // what the action wants to do (required)
   ArActionDesired myDesired;
-
   // This is the only part of the class definition you may need to change.
   // If you have any variables you want the robot to keep track of or
   // remember, declare them here.

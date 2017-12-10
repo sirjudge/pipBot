@@ -52,7 +52,6 @@ void setHome(void)
 // Create ArActionGoto
 // Set to Key Press
 
-
 /* Start main */
 int main(int argc, char **argv) {
 	ArRobot robot;			// Initialize Robot
