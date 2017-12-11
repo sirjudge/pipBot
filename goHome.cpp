@@ -14,8 +14,6 @@ public:
 	virtual void setNewHome(ArPose pos);
 	GoHome(ArRobot *robot);
 	~GoHome(void);
-
-
 protected:
 	ArActionDesired myDesired;
 	ArRangeDevice *myLaser;

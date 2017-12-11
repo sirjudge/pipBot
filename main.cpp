@@ -20,7 +20,6 @@ void turn(int degrees, ArRobot *robot);
 ArActionGroup *followGroup;
 ArActionGroup *stopGroup;
 ArActionGroup *homeGroup;
-ArActionGroup *gohomeGroup;
 ArPose homePose;
 
  // Activate the teleop action group. activateExlcusive() causes

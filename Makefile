@@ -11,7 +11,7 @@
 #
 
 # Targets to be made.
-TARGETS = dance follow lasers goHome
+TARGETS = dance follow lasers goHome superExample
 
 CFLAGS=-fPIC -g -Wall -Wextra
 ARIA_INCLUDE=-I/usr/local/Aria/include

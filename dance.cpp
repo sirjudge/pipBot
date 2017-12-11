@@ -115,7 +115,6 @@ int main(int argc, char** argv)
   pipMan.addAction(&tango,42);
   pipMan.comInt(ArCommands::ENABLE, 1); 			//Turn on the motors
 
-
   ArActionStallRecover recover;
 
 }
